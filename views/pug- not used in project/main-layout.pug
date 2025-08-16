@@ -1,0 +1,16 @@
+doctype
+html(lang='en')
+    head
+        meta(charset='utf-8')
+        title #{title}
+        block styles
+    body
+        header.main-header
+            nav.main-header__nav
+                ul.main-header__item-list
+                    li.main-header__item
+                        a(href="/", class=(path ==="/shop" ? 'active' : '')) Shop
+                    li.main-header__item
+                        a(href='/admin/add-product', class=(path === '/admin/add-product' ? 'active' : '')) Add Product
+        block contents
+    
