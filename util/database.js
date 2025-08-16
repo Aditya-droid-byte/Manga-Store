@@ -32,23 +32,21 @@
 //   });
 // };
 // module.exports = mongoClient;
-const { MongoClient } = require('mongodb');
+const { MongoClient } = require("mongodb");
 
 //const uri = "mongodb://localhost:27017";
-const uri = "mongodb+srv://srivastavaadi247:DiBmVvAYVL5k8aYx@cluster0.vj62rgt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri =
+  "mongodb+srv://srivastavaadi247:DiBmVvAYVL5k8aYx@cluster0.vj62rgt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const client = new MongoClient(uri);
 
 let db;
 
 function connectToMongo() {
-  return client.connect()
-    .then(() => {
-      console.log("✅ MongoDB connected");
-      db = client.db("Shop_Store");
-      console.log("Intialized Database -------> ",db
-        
-      )
-    });
+  return client.connect().then(() => {
+    console.log("✅ MongoDB connected");
+    db = client.db("Shop_Store");
+    console.log("Intialized Database -------> ");
+  });
 }
 
 function getDB() {
@@ -60,5 +58,5 @@ function getDB() {
 
 module.exports = {
   connectToMongo,
-  getDB
+  getDB,
 };

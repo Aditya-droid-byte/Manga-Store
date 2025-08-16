@@ -133,7 +133,7 @@ class Product {
       .find()
       .toArray()
       .then((products) => {
-        console.log("Found all product in DB ", products);
+        console.log("Found all product in DB");
         return products;
       })
       .catch((err) => {
