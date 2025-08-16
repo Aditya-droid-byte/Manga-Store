@@ -1,6 +1,6 @@
 {
   "name": "app-project",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Learning node",
   "main": "node-app.js",
   "scripts": {
