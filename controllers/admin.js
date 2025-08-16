@@ -13,7 +13,14 @@ exports.PostProducts = (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
   const imageUrl = req.body.imageUrl;
-  const newProduct = new Product(title, price, imageUrl, description);
+  const newProduct = new Product(
+    title,
+    price,
+    imageUrl,
+    description,
+    null,
+    req.user._id
+  );
   //mongodb
   newProduct
     .save()

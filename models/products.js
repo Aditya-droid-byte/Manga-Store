@@ -95,13 +95,15 @@
 // };
 const { getDB } = require("../util/database");
 const MongoDB = require("mongodb");
+const user = require("./user");
 class Product {
-  constructor(title, price, imageUrl, description, _id) {
+  constructor(title, price, imageUrl, description, _id, userId) {
     this.title = title;
     this.price = price;
     this.imageUrl = imageUrl;
     this.description = description;
     this._id = _id ? new MongoDB.ObjectId(_id) : null;
+    this.userId = userId;
   }
 
   save() {
