@@ -115,6 +115,7 @@ exports.getCart = (req, res, next) => {
 
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
+  console.log("PRODUCT ID FPR CAT ITEM TO BE REMOVED: ",typeof(prodId))
   req.user
     .removeItemFromCart(prodId)
     // .then((cart) => {
@@ -124,8 +125,8 @@ exports.postCartDeleteProduct = (req, res, next) => {
     //   const product = products[0];
     //   return product.cartItem.destroy();
     // })
-    .then(() => {
-      console.log("came here")
+    .then((result) => {
+      console.log("came here", result)
       res.redirect("/cart");
     })
     .catch((err) => {

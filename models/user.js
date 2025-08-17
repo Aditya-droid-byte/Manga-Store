@@ -58,20 +58,25 @@ class user {
 
   removeItemFromCart(productId) {
     const db = getDB();
-    this.cart.items = this.cart.items.filter((item) => {
-      return item.productId != productId;
+    const updatedCart = this.cart.items.filter((item) => {
+      console.log("Adding this to updatedCART: ",item.ProductId)
+      return item.ProductId.toString() !== productId.toString();
     });
-    return db.collection("users").updateOne(
-      { _id: this._id },
-      {
-        $set: { cart: this.cart },
-      }
-    ).then(result => {
-      console.log("Updated cart after removing item from cart: ",result);
-      return this.cart;
-    }).catch(err => {
-      console.log(err);
-    })
+    return db
+      .collection("users")
+      .updateOne(
+        { _id: new MongoClient.ObjectId(this._id) },
+        {
+          $set: { cart: { items: updatedCart } },
+        }
+      )
+      .then((result) => {
+        console.log("Updated cart after removing item from cart: ", result);
+        return this.cart;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   getCart() {
