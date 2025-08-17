@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const adminRoute = require("./routes/admin");
 const shopRoute = require("./routes/shop");
 const path = require("path");
-// const error = require("./controllers/error");
+const error = require("./controllers/error");
 const User = require("./models/user");
 const { connectToMongo } = require('./util/database');
 //const db = require("./util/database");
@@ -43,7 +43,7 @@ app.use((req, res, next) => {
 });
 app.use("/admin", adminRoute);
 app.use(shopRoute);
-//app.use(error.get404);
+app.use(error.get404);
 
 // Product.belongsTo(User, {
 //   constraints: true,

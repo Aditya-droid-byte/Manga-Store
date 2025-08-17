@@ -115,7 +115,7 @@ exports.getCart = (req, res, next) => {
 
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  console.log("PRODUCT ID FPR CAT ITEM TO BE REMOVED: ",typeof(prodId))
+  console.log("PRODUCT ID FPR CAT ITEM TO BE REMOVED: ", typeof prodId);
   req.user
     .removeItemFromCart(prodId)
     // .then((cart) => {
@@ -126,7 +126,7 @@ exports.postCartDeleteProduct = (req, res, next) => {
     //   return product.cartItem.destroy();
     // })
     .then((result) => {
-      console.log("came here", result)
+      console.log("came here", result);
       res.redirect("/cart");
     })
     .catch((err) => {
@@ -191,9 +191,9 @@ exports.postCart = (req, res, next) => {
 
 exports.getOrders = (req, res, next) => {
   req.user
-    .getOrders({ include: ["products"] })
+    .getOrders()
     .then((orders) => {
-      res.render("shop/order", {
+      res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Orders",
         orders: orders,
@@ -207,31 +207,9 @@ exports.getOrders = (req, res, next) => {
 exports.postOrder = (req, res, next) => {
   let fetchedCart;
   req.user
-    .getCart()
-    .then((cart) => {
-      fetchedCart = cart;
-      return cart.getProducts();
-    })
-    .then((products) => {
-      console.log(products);
-      return req.user
-        .createOrder()
-        .then((order) => {
-          return order.addProduct(
-            products.map((product) => {
-              product.orderItem = { quantity: product.cartItem.quantity };
-              return product;
-            })
-          );
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    })
+    .addOrder()
     .then((result) => {
-      return fetchedCart.setProducts(null);
-    })
-    .then((result) => {
+      console.log("result after ordering: ", result);
       res.redirect("/orders");
     })
     .catch((err) => {

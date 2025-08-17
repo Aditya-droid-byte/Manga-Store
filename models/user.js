@@ -29,6 +29,8 @@ class user {
     return db.collection("users").insertOne(this);
   }
   addToCart(product) {
+    const updatedCartForUser = this.cart && this.cart.items ? { ...this.cart } : { items: [] };
+
     const cartProductIndex = this.cart.items.findIndex(
       (cp) => cp.ProductId.toString() === product._id.toString()
     );
@@ -59,7 +61,7 @@ class user {
   removeItemFromCart(productId) {
     const db = getDB();
     const updatedCart = this.cart.items.filter((item) => {
-      console.log("Adding this to updatedCART: ",item.ProductId)
+      console.log("Adding this to updatedCART: ", item.ProductId);
       return item.ProductId.toString() !== productId.toString();
     });
     return db
@@ -77,6 +79,46 @@ class user {
       .catch((err) => {
         console.log(err);
       });
+  }
+
+  addOrder() {
+    const db = getDB();
+    return this.getCart()
+      .then((product) => {
+        const order = {
+          items: product,
+          user: {
+            _id: new MongoClient.ObjectId(this._id),
+            username: this.username,
+          },
+        };
+        return db.collection("order").insertOne(order);
+      })
+      .then((result) => {
+        console.log("Result after adding order to order collections: ", result);
+        this.cart = { items: [] };
+        return db.collection("users").updateOne(
+          {
+            _id: new MongoClient.ObjectId(this._id),
+          },
+          {
+            $set: {
+              cart: { items: [] },
+            },
+          }
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  getOrders() {
+    const db = getDB();
+    return db
+      .collection("order")
+      .find({ "user._id": new MongoClient.ObjectId(this._id) })
+      .toArray();
   }
 
   getCart() {

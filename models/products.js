@@ -114,7 +114,7 @@ class Product {
       dbOp = db
         .collection("products")
         .updateOne({ _id: new MongoDB.ObjectId(this._id) }, { $set: this });
-        console.log("*************Product updated (product.js)*************")
+      console.log("*************Product updated (product.js)*************");
     } else {
       dbOp = db.collection("products").insertOne(this);
     }
@@ -163,7 +163,17 @@ class Product {
       .deleteOne({ _id: new MongoDB.ObjectId(prodID) })
       .then((result) => {
         console.log("result ----------->: ", result);
-        return;
+        return db.collection("users").updateMany(
+          {},
+          {
+            $pull: {
+              "cart.items": { ProductId: new MongoDB.ObjectId(prodID) },
+            },
+          }
+        );
+      })
+      .then((result) => {
+        console.log("item deleted");
       })
       .catch((err) => {
         console.log(err);
