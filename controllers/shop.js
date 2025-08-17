@@ -1,4 +1,5 @@
 const Product = require("../models/products");
+const user = require("../models/user");
 //const cart = require("../models/cart");
 
 // exports.getProducts = (req, res, next) => {
@@ -55,7 +56,7 @@ exports.getProduct = (req, res, next) => {
 exports.getIndex = (req, res, next) => {
   Product.findAll()
     .then((products) => {
-    //  console.log("------------->", products);
+      //  console.log("------------->", products);
       res.render("shop/index", {
         prods: products,
         pageTitle: "Shop",
@@ -70,19 +71,13 @@ exports.getIndex = (req, res, next) => {
 exports.getCart = (req, res, next) => {
   req.user
     .getCart()
-    .then((cart) => {
-      return cart
-        .getProducts()
-        .then((products) => {
-          res.render("shop/cart", {
-            path: "/cart",
-            pageTitle: "Your Cart",
-            product: products,
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    .then((products) => {
+      console.log("Products recieved from mongoDB in getCart method", products);
+      res.render("shop/cart", {
+        path: "/cart",
+        pageTitle: "Your Cart",
+        product: products,
+      });
     })
     .catch((err) => {
       console.log(err);
@@ -121,15 +116,16 @@ exports.getCart = (req, res, next) => {
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
   req.user
-    .getCart()
-    .then((cart) => {
-      return cart.getProducts({ where: { id: prodId } });
-    })
-    .then((products) => {
-      const product = products[0];
-      return product.cartItem.destroy();
-    })
+    .removeItemFromCart(prodId)
+    // .then((cart) => {
+    //   return cart.getProducts({ where: { id: prodId } });
+    // })
+    // .then((products) => {
+    //   const product = products[0];
+    //   return product.cartItem.destroy();
+    // })
     .then(() => {
+      console.log("came here")
       res.redirect("/cart");
     })
     .catch((err) => {
@@ -149,6 +145,7 @@ exports.postCart = (req, res, next) => {
     })
     .then((result) => {
       console.log("Result for adding embedded product to cart", result);
+      res.redirect("/cart");
     })
     .catch((err) => {
       console.log(err);
@@ -189,7 +186,6 @@ exports.postCart = (req, res, next) => {
   //   cart.addProduct(productID, product.price);
   // });
   //////////////////////////////////////////
-  res.redirect("/cart");
 };
 
 exports.getOrders = (req, res, next) => {

@@ -45,7 +45,7 @@ class user {
     }
 
     const updatedCart = {
-      items: updatedCartItems
+      items: updatedCartItems,
     };
     const db = getDB();
     return db
@@ -54,6 +54,51 @@ class user {
         { _id: new MongoClient.ObjectId(this._id) },
         { $set: { cart: updatedCart } }
       );
+  }
+
+  removeItemFromCart(productId) {
+    const db = getDB();
+    this.cart.items = this.cart.items.filter((item) => {
+      return item.productId != productId;
+    });
+    return db.collection("users").updateOne(
+      { _id: this._id },
+      {
+        $set: { cart: this.cart },
+      }
+    ).then(result => {
+      console.log("Updated cart after removing item from cart: ",result);
+      return this.cart;
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  getCart() {
+    const db = getDB();
+    const productId = [];
+    const quantityInUser = {};
+    this.cart.items.forEach((prodDetailInUser) => {
+      console.log("Pritning cart itme one by one: ", prodDetailInUser);
+      productId.push(prodDetailInUser.ProductId);
+      quantityInUser[prodDetailInUser.ProductId] = prodDetailInUser.quantity;
+    });
+    console.log("ProductID: ", productId);
+    console.log("QuantityInUser: ", quantityInUser);
+
+    return db
+      .collection("products")
+      .find({ _id: { $in: productId } })
+      .toArray()
+      .then((p) => {
+        return p.map((product) => {
+          product.quantity = quantityInUser[product._id];
+          return product;
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
   static findById(userId) {
     const db = getDB();
