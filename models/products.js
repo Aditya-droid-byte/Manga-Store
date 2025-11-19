@@ -93,6 +93,10 @@
 //     });
 //   }
 // };
+
+////////////////////////////////Mongodb//////////////////////////////
+
+/* 
 const { getDB } = require("../util/database");
 const MongoDB = require("mongodb");
 const user = require("./user");
@@ -180,6 +184,35 @@ class Product {
       });
   }
 }
+
+
+
+*/
+
+///////////////////////////////////////////////////////////////
+////////Mongooose//////////////////
+
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const productSchema = new Schema({
+  title: {
+    Types: String,
+    required: true,
+  },
+  price: {
+    Types: Number,
+    required: true,
+  },
+  imageUrl: {
+    Types: String,
+    required: true,
+  },
+  description: {
+    Types: String,
+    required: true,
+  },
+});
+
 // const {Sequelize, DataTypes} = require('sequelize');
 // const sequelize = require('../util/database');
 

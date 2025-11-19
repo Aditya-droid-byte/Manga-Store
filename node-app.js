@@ -7,7 +7,8 @@ const shopRoute = require("./routes/shop");
 const path = require("path");
 const error = require("./controllers/error");
 const User = require("./models/user");
-const { connectToMongo } = require('./util/database');
+const mongoose = require("mongoose");
+//const { connectToMongo } = require('./util/database');
 //const db = require("./util/database");
 //const sequelize = require("./util/database");
 // const Product = require("./models/products");
@@ -85,12 +86,24 @@ app.use(error.get404);
 //   .catch((err) => {
 //     console.log(err);
 //   });
-connectToMongo()
-  .then(() => {
-    app.listen(4200, () => {
-      console.log("🚀 Server running on http://localhost:4200");
-    });
-  })
-  .catch(err => {
-    console.error("❌ Failed to connect to MongoDB", err);
+
+//Replacing it with mongooes
+// connectToMongo()
+//   .then(() => {
+//     app.listen(4200, () => {
+//       console.log("🚀 Server running on http://localhost:4200");
+//     });
+//   })
+//   .catch(err => {
+//     console.error("❌ Failed to connect to MongoDB", err);
+//   });
+
+const mongodbUri =
+  "mongodb+srv://srivastavaadi247:DiBmVvAYVL5k8aYx@cluster0.vj62rgt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+mongoose
+  .connect(mongodbUri)
+  .then(app.listen(4200))
+  .catch((err) => {
+    console.log(err);
   });
