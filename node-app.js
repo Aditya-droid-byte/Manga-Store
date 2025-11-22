@@ -33,9 +33,9 @@ app.use(bodyParser.urlencoded());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
-  User.findById("68a0a57ac11ecaf8c689b03d")
+  User.findById("6920ae0feb4899cfb3b7d6a9")
     .then((user) => {
-      req.user = new User(user.user, user.email, user.cart, user._id);
+      req.user = user;
       next();
     })
     .catch((err) => {
@@ -99,11 +99,21 @@ app.use(error.get404);
 //   });
 
 const mongodbUri =
-  "mongodb+srv://srivastavaadi247:DiBmVvAYVL5k8aYx@cluster0.vj62rgt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+  "mongodb+srv://srivastavaadi247:DiBmVvAYVL5k8aYx@cluster0.vj62rgt.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0";
 
 mongoose
   .connect(mongodbUri)
-  .then(app.listen(4200))
+  .then((result) => {
+    // const user = new User({
+    //   name: "Aditya",
+    //   email: "aditya@test.com",
+    //   cart: {
+    //     items: [],
+    //   },
+    // });
+    // user.save();
+    app.listen(4200);
+  })
   .catch((err) => {
     console.log(err);
   });

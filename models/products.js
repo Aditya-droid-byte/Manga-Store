@@ -196,23 +196,29 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const productSchema = new Schema({
   title: {
-    Types: String,
-    required: true,
+    type: String,
+    required: true
   },
   price: {
-    Types: Number,
-    required: true,
+    type: Number,
+    required: true
   },
   imageUrl: {
-    Types: String,
-    required: true,
+    type: String,
+    required: true
   },
   description: {
-    Types: String,
-    required: true,
+    type: String,
+    required: true
   },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  }
 });
 
+module.exports = mongoose.model('Product', productSchema);
 // const {Sequelize, DataTypes} = require('sequelize');
 // const sequelize = require('../util/database');
 
@@ -232,4 +238,4 @@ const productSchema = new Schema({
 //   }
 // });
 
-module.exports = Product;
+//module.exports = Product;
