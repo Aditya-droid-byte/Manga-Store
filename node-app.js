@@ -4,10 +4,12 @@ const bodyParser = require("body-parser");
 //const expressHBS = require("express-handlebars");
 const adminRoute = require("./routes/admin");
 const shopRoute = require("./routes/shop");
+const authRoute = require("./routes/auth");
 const path = require("path");
 const error = require("./controllers/error");
 const User = require("./models/user");
 const mongoose = require("mongoose");
+const session = require('express-session');
 //const { connectToMongo } = require('./util/database');
 //const db = require("./util/database");
 //const sequelize = require("./util/database");
@@ -32,6 +34,7 @@ app.use(bodyParser.urlencoded());
 
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use(session({secret: 'AnewKeyForSession', saveUninitialized: false, resave: false}))
 app.use((req, res, next) => {
   User.findById("6920ae0feb4899cfb3b7d6a9")
     .then((user) => {
@@ -44,6 +47,7 @@ app.use((req, res, next) => {
 });
 app.use("/admin", adminRoute);
 app.use(shopRoute);
+app.use(authRoute);
 app.use(error.get404);
 
 // Product.belongsTo(User, {

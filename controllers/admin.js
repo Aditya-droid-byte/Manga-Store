@@ -5,6 +5,7 @@ exports.addProducts = (req, res, next) => {
     pageTitle: "Product Page",
     path: "/admin/add-product",
     editing: false,
+    isAuthenticated: req.isLoggedIn
   });
 };
 
@@ -20,6 +21,7 @@ exports.PostProducts = (req, res, next) => {
     imageUrl: imageUrl,
     description: description,
     userId: req.user._id,
+    isAuthenticated: req.isLoggedIn
   });
   //mongodb
   newProduct
@@ -98,6 +100,7 @@ exports.editProducts = (req, res, next) => {
         path: "/admin/edit-product",
         editing: editProducts,
         product: product,
+        isAuthenticated: req.isLoggedIn
       });
     })
     .catch((err) => {
@@ -126,6 +129,7 @@ exports.getProducts = (req, res, next) => {
         prods: products,
         pageTitle: "Admin Products",
         path: "/admin/products",
+        isAuthenticated: req.isLoggedIn
       });
     })
     .catch((err) => {
