@@ -9,7 +9,14 @@ const path = require("path");
 const error = require("./controllers/error");
 const User = require("./models/user");
 const mongoose = require("mongoose");
-const session = require('express-session');
+const session = require("express-session");
+const mongoDBSession = require("connect-mongodb-session")(session);
+const mongodbUri =
+  "mongodb+srv://srivastavaadi247:DiBmVvAYVL5k8aYx@cluster0.vj62rgt.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0";
+const store = new mongoDBSession({
+  uri: mongodbUri,
+  collection: "sessions",
+});
 //const { connectToMongo } = require('./util/database');
 //const db = require("./util/database");
 //const sequelize = require("./util/database");
@@ -34,9 +41,19 @@ app.use(bodyParser.urlencoded());
 
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use(session({secret: 'AnewKeyForSession', saveUninitialized: false, resave: false}))
+app.use(
+  session({
+    secret: "AnewKeyForSession",
+    saveUninitialized: false,
+    resave: false,
+    store: store,
+  })
+);
 app.use((req, res, next) => {
-  User.findById("6920ae0feb4899cfb3b7d6a9")
+  if(!req.session.user){
+   return next();
+  }
+  User.findById(req.session.user._id)
     .then((user) => {
       req.user = user;
       next();
@@ -45,6 +62,7 @@ app.use((req, res, next) => {
       console.log(err);
     });
 });
+
 app.use("/admin", adminRoute);
 app.use(shopRoute);
 app.use(authRoute);
@@ -101,9 +119,6 @@ app.use(error.get404);
 //   .catch(err => {
 //     console.error("❌ Failed to connect to MongoDB", err);
 //   });
-
-const mongodbUri =
-  "mongodb+srv://srivastavaadi247:DiBmVvAYVL5k8aYx@cluster0.vj62rgt.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0";
 
 mongoose
   .connect(mongodbUri)
