@@ -8,8 +8,10 @@ const authRoute = require("./routes/auth");
 const path = require("path");
 const error = require("./controllers/error");
 const User = require("./models/user");
+const csrf = require("csurf");
 const mongoose = require("mongoose");
 const session = require("express-session");
+const flash = require('connect-flash');
 const mongoDBSession = require("connect-mongodb-session")(session);
 const mongodbUri =
   "mongodb+srv://srivastavaadi247:DiBmVvAYVL5k8aYx@cluster0.vj62rgt.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0";
@@ -34,6 +36,7 @@ const store = new mongoDBSession({
 //     layoutsDir: "",
 //   })
 // );
+
 app.set("view engine", "ejs");
 app.set("views", "views");
 
@@ -49,9 +52,14 @@ app.use(
     store: store,
   })
 );
+
+const csrfToken = csrf();
+app.use(csrfToken);
+app.use(flash());
+
 app.use((req, res, next) => {
-  if(!req.session.user){
-   return next();
+  if (!req.session.user) {
+    return next();
   }
   User.findById(req.session.user._id)
     .then((user) => {
@@ -61,6 +69,11 @@ app.use((req, res, next) => {
     .catch((err) => {
       console.log(err);
     });
+});
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken();
+  console.log("csrf token " +res.locals.csrfToken);
+  next();
 });
 
 app.use("/admin", adminRoute);
