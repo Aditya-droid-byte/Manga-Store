@@ -59,6 +59,10 @@ exports.postEditProduct = (req, res, next) => {
 
   Product.findById(prodId)
     .then((product) => {
+      if(product.userId.toString() !== req.user._id.toString()){
+        res.redirect('/');
+        return Promise.reject("Unauthorized action")
+      }
       (product.title = updatedTitle),
         (product.price = updatedPrice),
         (product.description = updatedDescription),
@@ -119,7 +123,7 @@ exports.editProducts = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  Product.find({userId: req.user._id})
     // .select("title price -_id")
     // .populate("userId")
     .then((products) => {
@@ -138,7 +142,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.deleteProduct = (req, res, next) => {
   const prodID = req.body.productId;
-  Product.findByIdAndDelete(prodID)
+  Product.deleteOne({_id: prodID, userId: req.user._id})
     .then((result) => {
       console.log("Destroyed Product");
       res.redirect("/admin/products");
