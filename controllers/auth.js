@@ -6,8 +6,8 @@ const crypto = require('crypto');
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "srivastavaadi247@gmail.com",
-    pass: "***REMOVED***"
+    user: "user your own email",
+    pass: "use your own password"
   }
 });
 exports.getLogin = (req, res, next) => {
