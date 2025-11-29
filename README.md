@@ -18,8 +18,6 @@ This is a backend‑focused **Node.js shopping application** built using:\
 
 ## 🎥 Demo Video
 
-Upload your video in a GitHub Issue and paste the video link below:
-
 https://github.com/user-attachments/assets/94b7fa93-4bf3-44a1-a8ba-0f68f239824a
 
 ---
