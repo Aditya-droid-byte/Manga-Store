@@ -1,5 +1,6 @@
 const Product = require("../models/products");
 const exValidator = require("express-validator");
+const mongoose = require("mongoose");
 
 exports.addProducts = (req, res, next) => {
   res.render("admin/edit-product", {
@@ -9,7 +10,7 @@ exports.addProducts = (req, res, next) => {
     isAuthenticated: req.session.isUserLoggedIn,
     hasErrors: false,
     errorMessage: null,
-    validationErrors: []
+    validationErrors: [],
   });
 };
 
@@ -18,7 +19,6 @@ exports.PostProducts = (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
   const imageUrl = req.body.imageUrl;
-  console.log("iuser name: " + req.user);
   const errors = exValidator.validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).render("admin/edit-product", {
@@ -30,12 +30,11 @@ exports.PostProducts = (req, res, next) => {
         title: title,
         price: price,
         imageUrl: imageUrl,
-        description: description
+        description: description,
       },
       isAuthenticated: req.session.isUserLoggedIn,
       errorMessage: errors.array()[0].msg,
-      validationErrors: errors.array()
-
+      validationErrors: errors.array(),
     });
   }
   const newProduct = new Product({
@@ -54,6 +53,9 @@ exports.PostProducts = (req, res, next) => {
     })
     .catch((err) => {
       console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 
   //sequalize
@@ -81,7 +83,7 @@ exports.postEditProduct = (req, res, next) => {
   const updatedPrice = req.body.price;
   const errors = exValidator.validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors.array())
+    console.log(errors.array());
     return res.status(422).render("admin/edit-product", {
       pageTitle: "Edit Product",
       path: "/admin/edit-product",
@@ -92,12 +94,11 @@ exports.postEditProduct = (req, res, next) => {
         price: updatedPrice,
         imageUrl: updatedImageUrl,
         description: updatedDescription,
-        _id: prodId
+        _id: prodId,
       },
       isAuthenticated: req.session.isUserLoggedIn,
       errorMessage: errors.array()[0].msg,
       validationErrors: errors.array(),
-
     });
   }
 
@@ -128,6 +129,9 @@ exports.postEditProduct = (req, res, next) => {
     })
     .catch((err) => {
       console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -150,13 +154,14 @@ exports.editProducts = (req, res, next) => {
         isAuthenticated: req.session.isUserLoggedIn,
         hasErrors: false,
         errorMessage: null,
-        validationErrors: []
-
-
+        validationErrors: [],
       });
     })
     .catch((err) => {
       console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
   // Product.findByID(productId, (product) => {
   //   if (!product) {
@@ -186,6 +191,9 @@ exports.getProducts = (req, res, next) => {
     })
     .catch((err) => {
       console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -198,5 +206,8 @@ exports.deleteProduct = (req, res, next) => {
     })
     .catch((err) => {
       console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };

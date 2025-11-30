@@ -11,7 +11,7 @@ const User = require("./models/user");
 const csrf = require("csurf");
 const mongoose = require("mongoose");
 const session = require("express-session");
-const flash = require('connect-flash');
+const flash = require("connect-flash");
 const mongoDBSession = require("connect-mongodb-session")(session);
 const mongodbUri =
   "mongodb+srv://srivastavaadi247:DiBmVvAYVL5k8aYx@cluster0.vj62rgt.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0";
@@ -63,23 +63,33 @@ app.use((req, res, next) => {
   }
   User.findById(req.session.user._id)
     .then((user) => {
+      if (!user) {
+        return next();
+      }
       req.user = user;
       next();
     })
     .catch((err) => {
-      console.log(err);
+      next(new Error(err));
     });
 });
 app.use((req, res, next) => {
   res.locals.csrfToken = req.csrfToken();
-  console.log("csrf token " +res.locals.csrfToken);
   next();
 });
 
 app.use("/admin", adminRoute);
 app.use(shopRoute);
 app.use(authRoute);
+app.use("/500", error.get500);
 app.use(error.get404);
+app.use((err, req, res, next) => {
+  res.status(500).render("500", {
+    pageTitle: "500 Technical error occured",
+    path: "/500",
+    isAuthenticated: req.session.isLoggedIn,
+  });
+});
 
 // Product.belongsTo(User, {
 //   constraints: true,

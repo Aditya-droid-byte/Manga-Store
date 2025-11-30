@@ -26,9 +26,9 @@ exports.getLogin = (req, res, next) => {
     isAuthenticated: req.session.isUserLoggedIn,
     errorMessage: message,
     oldInput: {
-      email: '',
-      password: ''
-    }
+      email: "",
+      password: "",
+    },
   });
 };
 
@@ -88,6 +88,9 @@ exports.postLogin = (req, res, next) => {
     })
     .catch((err) => {
       console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -160,10 +163,18 @@ exports.postSignup = (req, res, next) => {
           });
           return res.redirect("/login");
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log(err);
+          const error = new Error(err);
+          error.httpStatusCode = 500;
+          return next(error);
+        });
     })
     .catch((err) => {
       console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -214,6 +225,9 @@ exports.postReset = (req, res, next) => {
       })
       .catch((err) => {
         console.log(err);
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
       });
   });
 };
@@ -239,7 +253,12 @@ exports.getNewPassword = (req, res, next) => {
         email: email,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postNewPassword = (req, res, next) => {
@@ -273,5 +292,10 @@ exports.postNewPassword = (req, res, next) => {
         html: "Your password has been updated successfully",
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
