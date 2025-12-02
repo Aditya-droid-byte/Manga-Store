@@ -37,7 +37,6 @@ exports.postLogin = (req, res, next) => {
   const password = req.body.password;
   const errors = exValidator.validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors.array()[0]);
     return res.status(422).render("auth/login", {
       path: "/login",
       pageTitle: "login",
@@ -126,7 +125,6 @@ exports.postSignup = (req, res, next) => {
   const password = req.body.password;
   const errors = exValidator.validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors.array()[0]);
     return res.status(422).render("auth/signup", {
       path: "/signup",
       pageTitle: "Signup",
@@ -266,7 +264,6 @@ exports.postNewPassword = (req, res, next) => {
   const userId = req.body.userId;
   const passwordToken = req.body.passwordToken;
   const email = req.body.email;
-  console.log("email: " + email);
   let resetUser;
   User.findOne({
     resetToken: passwordToken,

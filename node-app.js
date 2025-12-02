@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
+const multer = require("multer");
 //const expressHBS = require("express-handlebars");
 const adminRoute = require("./routes/admin");
 const shopRoute = require("./routes/shop");
@@ -19,6 +20,27 @@ const store = new mongoDBSession({
   uri: mongodbUri,
   collection: "sessions",
 });
+const { v4: uuidv4 } = require("uuid");
+
+const storageFile = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
 //const { connectToMongo } = require('./util/database');
 //const db = require("./util/database");
 //const sequelize = require("./util/database");
@@ -40,9 +62,13 @@ const store = new mongoDBSession({
 app.set("view engine", "ejs");
 app.set("views", "views");
 
+app.use(
+  multer({ storage: storageFile, fileFilter: fileFilter }).single("image")
+);
 app.use(bodyParser.urlencoded());
 
 app.use(express.static(path.join(__dirname, "public")));
+app.use('/images',express.static(path.join(__dirname, "images")));
 
 app.use(
   session({
@@ -87,7 +113,7 @@ app.use((err, req, res, next) => {
   res.status(500).render("500", {
     pageTitle: "500 Technical error occured",
     path: "/500",
-    isAuthenticated: req.session.isLoggedIn,
+    isAuthenticated: req.session.isUserLoggedIn,
   });
 });
 

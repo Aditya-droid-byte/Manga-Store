@@ -24,7 +24,6 @@ router.post(
   "/edit-product",
   [
     exValidator.body("title").isString().isLength({ min: 4 }).trim(),
-    exValidator.body("imageUrl").isURL(),
     exValidator.body("price").isFloat(),
     exValidator.body("description").isLength({ min: 5, max: 200 }).trim(),
   ],

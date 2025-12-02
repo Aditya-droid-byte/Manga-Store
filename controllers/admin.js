@@ -18,7 +18,23 @@ exports.PostProducts = (req, res, next) => {
   const title = req.body.title;
   const price = req.body.price;
   const description = req.body.description;
-  const imageUrl = req.body.imageUrl;
+  const image = req.file;
+  if (!image) {
+    return res.status(422).render("admin/edit-product", {
+      pageTitle: "Add Product",
+      path: "/admin/edit-product",
+      editing: false,
+      hasErrors: true,
+      product: {
+        title: title,
+        price: price,
+        description: description,
+      },
+      isAuthenticated: req.session.isUserLoggedIn,
+      errorMessage: "Attached file is not an image",
+      validationErrors: [],
+    });
+  }
   const errors = exValidator.validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).render("admin/edit-product", {
@@ -29,7 +45,6 @@ exports.PostProducts = (req, res, next) => {
       product: {
         title: title,
         price: price,
-        imageUrl: imageUrl,
         description: description,
       },
       isAuthenticated: req.session.isUserLoggedIn,
@@ -37,6 +52,8 @@ exports.PostProducts = (req, res, next) => {
       validationErrors: errors.array(),
     });
   }
+  const imageUrl = image.path;
+
   const newProduct = new Product({
     title: title,
     price: price,
@@ -78,12 +95,11 @@ exports.PostProducts = (req, res, next) => {
 exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.productId;
   const updatedTitle = req.body.title;
-  const updatedImageUrl = req.body.imageUrl;
+  const image = req.file;
   const updatedDescription = req.body.description;
   const updatedPrice = req.body.price;
   const errors = exValidator.validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors.array());
     return res.status(422).render("admin/edit-product", {
       pageTitle: "Edit Product",
       path: "/admin/edit-product",
@@ -92,7 +108,6 @@ exports.postEditProduct = (req, res, next) => {
       product: {
         title: updatedTitle,
         price: updatedPrice,
-        imageUrl: updatedImageUrl,
         description: updatedDescription,
         _id: prodId,
       },
@@ -108,10 +123,12 @@ exports.postEditProduct = (req, res, next) => {
         res.redirect("/");
         return Promise.reject("Unauthorized action");
       }
-      (product.title = updatedTitle),
-        (product.price = updatedPrice),
-        (product.description = updatedDescription),
-        (product.imageUrl = updatedImageUrl);
+      product.title = updatedTitle;
+      product.price = updatedPrice;
+      product.description = updatedDescription;
+      if(image){
+        product.imageUrl = image.path;
+      }
       return product.save();
     })
     // const newProduct = new Product({
@@ -181,7 +198,6 @@ exports.getProducts = (req, res, next) => {
     // .select("title price -_id")
     // .populate("userId")
     .then((products) => {
-      console.log(products);
       res.render("admin/products", {
         prods: products,
         pageTitle: "Admin Products",
@@ -201,7 +217,6 @@ exports.deleteProduct = (req, res, next) => {
   const prodID = req.body.productId;
   Product.deleteOne({ _id: prodID, userId: req.user._id })
     .then((result) => {
-      console.log("Destroyed Product");
       res.redirect("/admin/products");
     })
     .catch((err) => {

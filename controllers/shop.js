@@ -1,7 +1,9 @@
 const Product = require("../models/products");
 const user = require("../models/user");
 const Order = require("../models/order");
-
+const fs = require("fs");
+const path = require("path");
+const pdfDoc = require("pdfkit");
 //const cart = require("../models/cart");
 
 // exports.getProducts = (req, res, next) => {
@@ -23,7 +25,6 @@ const Order = require("../models/order");
 exports.getProducts = (req, res, next) => {
   Product.find()
     .then((products) => {
-      console.log("---------------->", products);
       res.render("shop/product-list", {
         prods: products,
         pageTitle: "All Products",
@@ -42,10 +43,8 @@ exports.getProducts = (req, res, next) => {
 
 exports.getProduct = (req, res, next) => {
   const queryParams = req.params.productID;
-  console.log("queryParams", queryParams);
   Product.findById(queryParams)
     .then((product) => {
-      console.log("GEt product by id------: ", product);
       res.render("shop/product-detail", {
         product: product,
         pageTitle: product.title,
@@ -87,7 +86,6 @@ exports.getCart = (req, res, next) => {
   req.user
     .populate("cart.items.productId")
     .then((user) => {
-      console.log("Products recieved from getCart method", user.cart.items);
       res.render("shop/cart", {
         path: "/cart",
         pageTitle: "Your Cart",
@@ -144,7 +142,6 @@ exports.postCartDeleteProduct = (req, res, next) => {
     //   return product.cartItem.destroy();
     // })
     .then((result) => {
-      console.log("came here", result);
       res.redirect("/cart");
     })
     .catch((err) => {
@@ -166,7 +163,6 @@ exports.postCart = (req, res, next) => {
       return req.user.addToCart(product);
     })
     .then((result) => {
-      console.log("Result for adding embedded product to cart", result);
       res.redirect("/cart");
     })
     .catch((err) => {
@@ -216,7 +212,6 @@ exports.postCart = (req, res, next) => {
 exports.getOrders = (req, res, next) => {
   Order.find({ "user.userId": req.user._id })
     .then((orders) => {
-      console.log(orders);
       res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Orders",
@@ -260,5 +255,72 @@ exports.postOrder = (req, res, next) => {
       const error = new Error(err);
       error.httpStatusCode = 500;
       return next(error);
+    });
+};
+
+exports.getInvoice = (req, res, next) => {
+  const orderId = req.params.orderId;
+  Order.findById(orderId)
+    .then((order) => {
+      if (!order) {
+        return next(new Error("No order found"));
+      }
+      if (order.user.userId != req.user._id.toString()) {
+        return next(new Error("Unauthoirized user access"));
+      }
+      const invoiceName = "invoice-" + orderId + ".pdf";
+      const invoicePath = path.join("data", "invoices", invoiceName);
+      const pdfDocument = new pdfDoc();
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        'inline; filename="' + invoiceName + '"'
+      );
+      pdfDocument.pipe(fs.createWriteStream(invoicePath));
+      pdfDocument.pipe(res);
+
+      pdfDocument.fontSize(26).text("Invoice");
+
+      pdfDocument.text("-------------------------------");
+      let totalPrice = 0
+      order.products.forEach((prod) => {
+        totalPrice += prod.quantity * prod.product.price
+        pdfDocument.fontSize(14).text(
+          prod.product.title +
+            " : " +
+            prod.quantity +
+            " * " +
+            "Rs" +
+            prod.product.price
+        );
+      });
+      pdfDocument.text("-------------------------------");
+     
+      pdfDocument.text('Total price: Rs '+ totalPrice)
+
+      pdfDocument.end();
+
+      ///////////////////
+      // fs.readFile(invoicePath, (err, data) => {
+      //   if (err) {
+      //     console.log(err);
+      //     return next(err);
+      //   }
+      //   res.setHeader('Content-Type', 'application/pdf');
+      //   res.setHeader('Content-Disposition', 'inline; filename="' + invoiceName + '"')
+      //   res.send(data);
+
+      ///////////////////////////////
+      // const file = fs.createReadStream(invoicePath);
+      // res.setHeader("Content-Type", "application/pdf");
+      // res.setHeader(
+      //   "Content-Disposition",
+      //   'inline; filename="' + invoiceName + '"'
+      // );
+      // file.pipe(res);
+    })
+    .catch((err) => {
+      console.log("Came here: " + err);
+      next(err);
     });
 };
