@@ -38,7 +38,12 @@ https://github.com/user-attachments/assets/94b7fa93-4bf3-44a1-a8ba-0f68f239824a
 -   View cart items\
 -   Place orders\
 -   View order history
+<<<<<<< HEAD
 -   Pagination
+=======
+-   Invoice generation
+-   Upload/Download file
+>>>>>>> 696e53bcd2884c806f68ef505e00f92b26c6edca
 
 ### 🧑‍💼 Admin Features
 
