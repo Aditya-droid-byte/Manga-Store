@@ -4,6 +4,7 @@ const Order = require("../models/order");
 const fs = require("fs");
 const path = require("path");
 const pdfDoc = require("pdfkit");
+const ITEMS_PER_PAGE = 2;
 //const cart = require("../models/cart");
 
 // exports.getProducts = (req, res, next) => {
@@ -23,13 +24,28 @@ const pdfDoc = require("pdfkit");
 //     console.log(err);
 //   })
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  const page = +req.query.page || 1;
+  let totalCount;
+  Product.countDocuments()
+    .then((docCount) => {
+      totalCount = docCount;
+      return Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
     .then((products) => {
       res.render("shop/product-list", {
         prods: products,
-        pageTitle: "All Products",
+        pageTitle: "Products",
         path: "/products",
         isAuthenticated: req.session.isUserLoggedIn,
+        csrfToken: req.csrfToken(),
+        currentPage: page,
+        hasNextPage: ITEMS_PER_PAGE * page < totalCount,
+        hasPreviousPage: page > 1,
+        nextPage: page + 1,
+        previousPage: page - 1,
+        lastPage: Math.ceil(totalCount / ITEMS_PER_PAGE),
       });
     })
     .catch((err) => {
@@ -63,7 +79,15 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-  Product.find()
+  const page = +req.query.page || 1;
+  let totalCount;
+  Product.countDocuments()
+    .then((docCount) => {
+      totalCount = docCount;
+      return Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
     .then((products) => {
       //  console.log("------------->", products);
       res.render("shop/index", {
@@ -72,6 +96,12 @@ exports.getIndex = (req, res, next) => {
         path: "/",
         isAuthenticated: req.session.isUserLoggedIn,
         csrfToken: req.csrfToken(),
+        currentPage: page,
+        hasNextPage: ITEMS_PER_PAGE * page < totalCount,
+        hasPreviousPage: page > 1,
+        nextPage: page + 1,
+        previousPage: page - 1,
+        lastPage: Math.ceil(totalCount / ITEMS_PER_PAGE),
       });
     })
     .catch((err) => {
@@ -282,21 +312,23 @@ exports.getInvoice = (req, res, next) => {
       pdfDocument.fontSize(26).text("Invoice");
 
       pdfDocument.text("-------------------------------");
-      let totalPrice = 0
+      let totalPrice = 0;
       order.products.forEach((prod) => {
-        totalPrice += prod.quantity * prod.product.price
-        pdfDocument.fontSize(14).text(
-          prod.product.title +
-            " : " +
-            prod.quantity +
-            " * " +
-            "Rs" +
-            prod.product.price
-        );
+        totalPrice += prod.quantity * prod.product.price;
+        pdfDocument
+          .fontSize(14)
+          .text(
+            prod.product.title +
+              " : " +
+              prod.quantity +
+              " * " +
+              "Rs" +
+              prod.product.price
+          );
       });
       pdfDocument.text("-------------------------------");
-     
-      pdfDocument.text('Total price: Rs '+ totalPrice)
+
+      pdfDocument.text("Total price: Rs " + totalPrice);
 
       pdfDocument.end();
 
