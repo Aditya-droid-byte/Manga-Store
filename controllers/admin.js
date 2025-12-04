@@ -214,15 +214,20 @@ exports.getProducts = (req, res, next) => {
 };
 
 exports.deleteProduct = (req, res, next) => {
-  const prodID = req.body.productId;
+  const prodID = req.params.productId;
   Product.deleteOne({ _id: prodID, userId: req.user._id })
     .then((result) => {
-      res.redirect("/admin/products");
+
+      //instead of returning page 
+      //res.redirect("/admin/products");
+      // returning dynamic data to load ui
+      res.status(200).json({message: 'Success!'});
     })
     .catch((err) => {
       console.log(err);
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
+      // const error = new Error(err);
+      // error.httpStatusCode = 500;
+      // return next(error);
+      res.status(500).json({message: 'failed to delete product'});
     });
 };
