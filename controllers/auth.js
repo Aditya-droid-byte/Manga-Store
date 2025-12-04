@@ -3,14 +3,8 @@ const encrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const exValidator = require("express-validator");
+const transporter = require('../util/transporter.js');
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "use your own email",
-    pass: "**REMOVED**",
-  },
-});
 exports.getLogin = (req, res, next) => {
   // const isLoggedIn = req.get('Cookie').split('; ')[0].trim().split('=')[1];
   // console.log(isLoggedIn);
@@ -296,3 +290,5 @@ exports.postNewPassword = (req, res, next) => {
       return next(error);
     });
 };
+
+

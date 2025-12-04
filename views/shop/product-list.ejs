@@ -4,7 +4,7 @@
 
     <body>
         <%- include('../includes/navigation.ejs') %>
-
+         
             <main>
                 <% if (prods.length > 0) { %>
                     <div class="grid">
@@ -48,3 +48,11 @@
                         <% } %>
             </main>
             <%- include('../includes/end.ejs') %>
+
+        <script src="/js/admin.js"></script>
+        <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("added") === "true") {
+            showAlert();
+        }
+        </script>

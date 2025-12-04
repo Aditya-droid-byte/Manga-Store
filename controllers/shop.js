@@ -5,6 +5,9 @@ const fs = require("fs");
 const path = require("path");
 const pdfDoc = require("pdfkit");
 const ITEMS_PER_PAGE = 2;
+const stripe = require("stripe")(
+  "use your own key"
+);
 //const cart = require("../models/cart");
 
 // exports.getProducts = (req, res, next) => {
@@ -193,7 +196,7 @@ exports.postCart = (req, res, next) => {
       return req.user.addToCart(product);
     })
     .then((result) => {
-      res.redirect("/cart");
+      res.redirect("/products?added=true");
     })
     .catch((err) => {
       console.log(err);
@@ -257,7 +260,7 @@ exports.getOrders = (req, res, next) => {
     });
 };
 
-exports.postOrder = (req, res, next) => {
+exports.getCheckoutSuccess = (req, res, next) => {
   let fetchedCart;
   req.user
     .populate("cart.items.productId")
@@ -354,5 +357,52 @@ exports.getInvoice = (req, res, next) => {
     .catch((err) => {
       console.log("Came here: " + err);
       next(err);
+    });
+};
+
+exports.getCheckout = (req, res, next) => {
+  let products;
+
+  let total = 0;
+  req.user
+    .populate("cart.items.productId")
+    .then((user) => {
+      products = user.cart.items;
+      products.forEach((p) => {
+        total += p.quantity * p.productId.price;
+      });
+      return stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: products.map((p) => {
+          return {
+            price_data: {
+              currency: "inr",
+              product_data: {
+                name: p.productId.title,
+                description: p.productId.description,
+              },
+              unit_amount: p.productId.price * 100,
+            },
+            quantity: p.quantity,
+          };
+        }),
+        mode: "payment",
+        success_url:
+          req.protocol + "://" + req.get("host") + "/checkout/success",
+        cancel_url: req.protocol + "://" + req.get("host") + "/checkout/cancel",
+      });
+    })
+    .then((session) => {
+      res.render("shop/checkout", {
+        path: "/checkout",
+        pageTitle: "Checkout",
+        products: products,
+        totalSum: total,
+        isAuthenticated: req.session.isUserLoggedIn,
+        sessionId: session.id,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
     });
 };

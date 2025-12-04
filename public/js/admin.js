@@ -20,3 +20,9 @@ const deleteProductById = (btn) => {
     })
     .catch((err) => console.log(err));
 };
+
+
+const showAlert = () => {
+  alert("Product has been added to cart");
+}
+ 
