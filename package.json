@@ -10,7 +10,7 @@
   "author": "Aditya Priyam",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.14"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -32,6 +32,6 @@
     "pug": "^3.0.3",
     "sequelize": "^6.37.7",
     "stripe": "^20.0.0",
-    "uuid": "^13.0.0"
+    "uuid": "^8.3.2"
   }
 }
