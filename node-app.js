@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const multer = require("multer");
+const fs = require("fs");
 //const expressHBS = require("express-handlebars");
 const adminRoute = require("./routes/admin");
 const shopRoute = require("./routes/shop");
@@ -14,13 +15,18 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const flash = require("connect-flash");
 const mongoDBSession = require("connect-mongodb-session")(session);
-const mongodbUri =
-  "mongodb+srv://srivastavaadi247:DiBmVvAYVL5k8aYx@cluster0.vj62rgt.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0";
+const mongodbUri = process.env.MONGODB_URL;
 const store = new mongoDBSession({
   uri: mongodbUri,
   collection: "sessions",
 });
+const compression = require('compression');
+const helmet = require('helmet');
 const { v4: uuidv4 } = require("uuid");
+const morgan = require("morgan");
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access_log'), {
+  flags: 'a'
+});
 
 const storageFile = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -62,13 +68,17 @@ const fileFilter = (req, file, cb) => {
 app.set("view engine", "ejs");
 app.set("views", "views");
 
+app.use(morgan('combined', {
+  stream: accessLogStream
+}));
+
 app.use(
   multer({ storage: storageFile, fileFilter: fileFilter }).single("image")
 );
 app.use(bodyParser.urlencoded());
 
 app.use(express.static(path.join(__dirname, "public")));
-app.use('/images',express.static(path.join(__dirname, "images")));
+app.use('/images', express.static(path.join(__dirname, "images")));
 
 app.use(
   session({
@@ -116,6 +126,8 @@ app.use((err, req, res, next) => {
     isAuthenticated: req.session.isUserLoggedIn,
   });
 });
+app.use(helmet);
+app.use(compression);
 
 // Product.belongsTo(User, {
 //   constraints: true,
@@ -180,7 +192,7 @@ mongoose
     //   },
     // });
     // user.save();
-    app.listen(4200);
+    app.listen(process.env.PORT || 4200);
   })
   .catch((err) => {
     console.log(err);

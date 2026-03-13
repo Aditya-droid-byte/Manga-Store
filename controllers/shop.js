@@ -5,8 +5,9 @@ const fs = require("fs");
 const path = require("path");
 const pdfDoc = require("pdfkit");
 const ITEMS_PER_PAGE = 2;
+console.log("Stripe_Key:", process.env.STRIPE_KEY);
 const stripe = require("stripe")(
-  "use your own key"
+  process.env.STRIPE_KEY
 );
 //const cart = require("../models/cart");
 
@@ -322,11 +323,11 @@ exports.getInvoice = (req, res, next) => {
           .fontSize(14)
           .text(
             prod.product.title +
-              " : " +
-              prod.quantity +
-              " * " +
-              "Rs" +
-              prod.product.price
+            " : " +
+            prod.quantity +
+            " * " +
+            "Rs" +
+            prod.product.price
           );
       });
       pdfDocument.text("-------------------------------");

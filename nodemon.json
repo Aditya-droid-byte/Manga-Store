@@ -1,0 +1,10 @@
+{
+    "env": {
+        "MONGODB_URL": "mongodb+srv://srivastavaadi247:DiBmVvAYVL5k8aYx@cluster0.vj62rgt.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0",
+        "PORT": 4200,
+        "transporterUser": "dummy key",
+        "transporterPassword": "dummy key",
+        "STRIPE_KEY": "dummy key",
+        "STRIPE_PK": "dummy key"
+    }
+}
